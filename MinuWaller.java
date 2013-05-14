@@ -20,15 +20,18 @@ public class MinuWaller extends Actor {
      
      private MinuWaller opponent;
      
-     private int delay = 2;
+     private int delay;
+	private int wallLife; 
      
      public MinuWaller() {
           setColor(Color.RED);
+		delay = 2;
           count = 0;
           icount = 0;
           alive = true;
           aboutToDie = false;
           hasTurned = false;
+		wallLife = MinuWall.LIFETIME;
           //invincible = false;
      } 
      
@@ -40,6 +43,9 @@ public class MinuWaller extends Actor {
      
      public void setDelay(int val) { this.delay = val; }
      public int getDelay() { return this.delay; }
+
+	public void setWallLife(int val) { this.wallLife = val; }
+	public int getWallFile() { return this.wallLife; }
      
      public MinuWaller(Color theColor) {
           this();
@@ -70,6 +76,7 @@ public class MinuWaller extends Actor {
            }*/
           
           if (this.canMove()) {
+
                return ( this.move() );
           } else {
                //if (!this.invincible)
@@ -168,6 +175,7 @@ public class MinuWaller extends Actor {
           else
                removeSelfFromGrid();
           MinuWall wall = new MinuWall(getColor());
+		wall.setLifetime(this.wallLife);
           wall.putSelfInGrid(gr, loc);
           this.setHasTurned(false);
           return wall;
