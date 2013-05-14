@@ -6,11 +6,16 @@ public class MinuWall extends Actor
 	private static final Color DEFAULT_COLOR = Color.RED;
 	private int counter = 0;
 	
-	private static int LIFETIME = 100;
+	public static int LIFETIME = 100;
+	private int life;
+
+	public void setLifetime(int val) { this.life = val; }
+	public int getLifetime() { return this.life; }
 	
 	public MinuWall()
 	{
 		setColor(DEFAULT_COLOR);
+		life = LIFETIME;
 	} 
 	
 	public MinuWall(Color initialColor)
@@ -24,7 +29,7 @@ public class MinuWall extends Actor
 	
 	public void act()
 	{
-		if (counter == LIFETIME)
+		if (counter == life)
 		{
 			removeSelfFromGrid();
 		} 
