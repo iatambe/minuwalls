@@ -12,6 +12,8 @@ public class MWWorld extends ActorWorld {
      
      public static final int GRID_WIDTH = 42;
      public static final int GRID_LENGTH = 92;
+	 
+	 public static int SCORE_LIM = 10;
      
      private boolean isPaused, isFirstRound; // isFirstRound is used so that the intro music doesn't play until run his hit the first time.
      private boolean exp; // whether there is an explosion happening right now
@@ -60,7 +62,7 @@ public class MWWorld extends ActorWorld {
           
           super.setMessage(
                            "Use the arrow keys(Player 2/Red) or the a/s/d/w keys(Player 1/Blue)"
-                                + "to make the MinuWaller turn left or right.\nSet the slider below to the Fastest setting "
+                                + "to make the MinuWaller turn left or right.\nSet the slider below to the Fastest setting and resize this window to the size of the grid "
                                 + "for the best gameplay experience."
                           );
           
@@ -220,7 +222,7 @@ public class MWWorld extends ActorWorld {
      } 
      
      @Override public void step() {
-          if (steps == 2147483647)
+          if (steps == 2147483647)//maximum int limit
                steps = 999;
           
           if (this.isPaused) {
@@ -258,13 +260,14 @@ public class MWWorld extends ActorWorld {
           if (this.isFirstRound){
                mwsh.playIntro();
                this.isFirstRound = false;
-          } 
-          
-          steps++;
-          
-          if (this.steps == 300) {
+          }
+		  
+		  if (this.steps == 305 && !exp) {// && score1 != SCORE_LIM && score2 != SCORE_LIM) {
+		  		System.out.println("START SONG");
                this.mwsh.startBG();
           } 
+		  
+		  steps++;
           
           /* for the stoplight */
           boolean shouldContinue = this.handleStoplight();
@@ -354,12 +357,15 @@ public class MWWorld extends ActorWorld {
      // return value: whether the other Actors may act() yet
      private boolean handleStoplight() {
           if (steps == 1) {
+		       System.out.println("3...");
                //this.drawStoplight(); // will instead be done in startNew()
           } else if (steps == 115) {//30 orig
+		       System.out.println("2...");
                for (MinuWall w : this.stoplight) {
                     w.setColor(Color.YELLOW);
                } 
           } else if (steps == 200) {//60 orig
+		  	   System.out.println("1...GO!");
                for (MinuWall w : this.stoplight) {
                     w.setColor(Color.GREEN);
                } 
@@ -411,6 +417,7 @@ public class MWWorld extends ActorWorld {
      
      // when both players are "scheduled" to die in a step
      private void bothWillDie() {
+	 	  System.out.println("Players crashed at the same time, no one wins the round.");
           ArrayList<ExplosionBlock> p1List, p2List;
           Location loc1 = p1.getLocation(), loc2 = p2.getLocation();
           
@@ -450,10 +457,18 @@ public class MWWorld extends ActorWorld {
                winner = this.p2;
                loser = this.p1;
                this.score2++;
+			   if (SCORE_LIM - score2 == 0)
+			        System.out.println("p2 wins the game!");
+			   else
+			  	    System.out.println("p2 wins the round! p2 needs " + (10 - score2) + " more wins to win the game.");
           } else { // if (num == 2)
                winner = this.p1;
                loser = this.p2;
                this.score1++;
+			   if (SCORE_LIM - score1 == 0)
+			        System.out.println("p1 wins the game!");
+			   else
+			        System.out.println("p1 wins the round! p1 needs " + (10 - score1) + " more wins to win the game.");
           } 
           
           loser.setIsAlive(false);
@@ -470,14 +485,17 @@ public class MWWorld extends ActorWorld {
                            "Score: red " + score2 + ", blue " + score1 +
                            "\nPress SPACE or P to pause, Y for a new round, or N for a new game (resets the score)."
                           );
-          if (score1 == 10)
+          if (score1 == SCORE_LIM)
           {
+		  	System.out.println("CHECK");
                this.gameOver = true;
                if (steps < 300)
                {
                     this.mwsh.stopBG();
                     this.mwsh.startBG();
-               }
+               }  else {
+			       
+				}
                super.setMessage(
                                 "Score: red " + score2 + ", blue " + score1 + " PLAYER 1 WINS!" +
                                 "\nPress N or Y for a new game."
@@ -485,14 +503,14 @@ public class MWWorld extends ActorWorld {
                score1 = 0;
                score2 = 0;
           }
-          if (score2 == 10)
+          if (score2 == SCORE_LIM)
           {
                this.gameOver = true;
                if (steps < 300)
                {
                     this.mwsh.stopBG();
                     this.mwsh.startBG();
-               }
+               } 
                super.setMessage(
                                 "Score: red " + score2 + ", blue " + score1 + " PLAYER 2 WINS!" +
                                 "\nPress N or Y for a new game."
