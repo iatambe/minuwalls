@@ -15,6 +15,7 @@ public class MWWorld extends ActorWorld {
      
      private boolean isPaused, isFirstRound; // isFirstRound is used so that the intro music doesn't play until run his hit the first time.
      private boolean exp; // whether there is an explosion happening right now
+     private boolean gameOver;
      
      private MinuWaller p1, p2;
      private int score1, score2;
@@ -39,6 +40,7 @@ public class MWWorld extends ActorWorld {
           super(new BoundedGrid<Actor> (GRID_WIDTH, GRID_LENGTH));
           this.grid = (BoundedGrid<Actor>)(super.getGrid());
           this.isFirstRound = true;
+          this.gameOver = false;
           this.mwsh = new MWSoundHandler();
           
           this.kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -57,8 +59,9 @@ public class MWWorld extends ActorWorld {
           powers = null;
           
           super.setMessage(
-                           "Use the arrow keys(Player 1/Red) or the a/s/d/w keys(Player 2/Blue)"
-                                + "to make the MinuWaller turn left or right."
+                           "Use the arrow keys(Player 2/Red) or the a/s/d/w keys(Player 1/Blue)"
+                                + "to make the MinuWaller turn left or right.\nSet the slider below to the Fastest setting "
+                                + "for the best gameplay experience."
                           );
           
           p1 = p2 = null;
@@ -144,6 +147,14 @@ public class MWWorld extends ActorWorld {
      
      public void startNew() {  
           this.mwsh.stopBG();
+          if (this.gameOver)
+          {
+               this.gameOver = false;
+               super.setMessage(
+                                "Score: red " + score2 + ", blue " + score1 +
+                                "\nPress SPACE or P to pause, Y for a new round, or N for a new game (resets the score)."
+                               );
+          }
           ArrayList<Location> locList = grid.getOccupiedLocations();
           //this.mwsh.stopBG(); // start mario music
           if (! locList.isEmpty()) {
@@ -209,11 +220,40 @@ public class MWWorld extends ActorWorld {
      } 
      
      @Override public void step() {
+          if (steps == 2147483647)
+               steps = 999;
+          
           if (this.isPaused) {
                return;
           } 
           
-         
+          if (this.gameOver == true)
+          {
+               if (exp == false)
+               {
+                    return;
+               }
+               /*ArrayList <Location>allActorLocs;
+               
+               if (p1Won)
+                    allActorLocs = p1.getGrid().getOccupiedLocations();
+               else
+                    allActorLocs = p2.getGrid().getOccupiedLocations();
+               for (Location a : allActorLocs)
+               {
+                    if (p1Won)
+                    {
+                         if (p1.getGrid().get(a) instanceof ExplosionBlock)
+                              steps--;//
+                    }
+                    
+                    else
+                    {
+                         
+                    }
+               }*/
+               
+          }
           
           if (this.isFirstRound){
                mwsh.playIntro();
@@ -285,7 +325,7 @@ public class MWWorld extends ActorWorld {
                     i++;
                } 
                this.expBlocks = newList;
-               if (this.expBlocks.isEmpty()) {
+               if (this.expBlocks.isEmpty() && gameOver == false) {
                     this.exp = false;
                     this.startNew();
                } 
@@ -430,6 +470,36 @@ public class MWWorld extends ActorWorld {
                            "Score: red " + score2 + ", blue " + score1 +
                            "\nPress SPACE or P to pause, Y for a new round, or N for a new game (resets the score)."
                           );
+          if (score1 == 1)
+          {
+               this.gameOver = true;
+               if (steps < 300)
+               {
+                    this.mwsh.stopBG();
+                    this.mwsh.startBG();
+               }
+               super.setMessage(
+                                "Score: red " + score2 + ", blue " + score1 + " PLAYER 1 WINS!" +
+                                "\nPress N or Y for a new game."
+                               );
+               score1 = 0;
+               score2 = 0;
+          }
+          if (score2 == 1)
+          {
+               this.gameOver = true;
+               if (steps < 300)
+               {
+                    this.mwsh.stopBG();
+                    this.mwsh.startBG();
+               }
+               super.setMessage(
+                                "Score: red " + score2 + ", blue " + score1 + " PLAYER 2 WINS!" +
+                                "\nPress N or Y for a new game."
+                               );
+               score1 = 0;
+               score2 = 0;
+          }
      }
      
      /* This is the KeyEvent handling method.
@@ -460,7 +530,8 @@ public class MWWorld extends ActorWorld {
           } 
           if (key.equals("pressed N")) {
                this.startNew();
-               score1 = score2 = 0;
+               score1 = 0;
+               score2 = 0;
                if (!this.isPaused)    
                     super.setMessage(
                                      "Score: red " + score2 + ", blue " + score1
