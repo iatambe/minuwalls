@@ -470,7 +470,7 @@ public class MWWorld extends ActorWorld {
                            "Score: red " + score2 + ", blue " + score1 +
                            "\nPress SPACE or P to pause, Y for a new round, or N for a new game (resets the score)."
                           );
-          if (score1 == 1)
+          if (score1 == 10)
           {
                this.gameOver = true;
                if (steps < 300)
@@ -485,7 +485,7 @@ public class MWWorld extends ActorWorld {
                score1 = 0;
                score2 = 0;
           }
-          if (score2 == 1)
+          if (score2 == 10)
           {
                this.gameOver = true;
                if (steps < 300)
