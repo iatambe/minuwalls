@@ -12,8 +12,8 @@ public class MWWorld extends ActorWorld {
      
      public static final int GRID_WIDTH = 42;
      public static final int GRID_LENGTH = 92;
-	 
-	 public static int SCORE_LIM = 10;
+  
+  public static int SCORE_LIM = 10;
      
      private boolean isPaused, isFirstRound; // isFirstRound is used so that the intro music doesn't play until run his hit the first time.
      private boolean exp; // whether there is an explosion happening right now
@@ -261,13 +261,13 @@ public class MWWorld extends ActorWorld {
                mwsh.playIntro();
                this.isFirstRound = false;
           }
-		  
-		  if (this.steps == 305 && !exp) {// && score1 != SCORE_LIM && score2 != SCORE_LIM) {
-		  		System.out.println("START SONG");
+    
+    if (this.steps == 305 && !exp) {// && score1 != SCORE_LIM && score2 != SCORE_LIM) {
+      
                this.mwsh.startBG();
           } 
-		  
-		  steps++;
+    
+    steps++;
           
           /* for the stoplight */
           boolean shouldContinue = this.handleStoplight();
@@ -357,15 +357,15 @@ public class MWWorld extends ActorWorld {
      // return value: whether the other Actors may act() yet
      private boolean handleStoplight() {
           if (steps == 1) {
-		       System.out.println("3...");
+         System.out.println("3...");
                //this.drawStoplight(); // will instead be done in startNew()
           } else if (steps == 115) {//30 orig
-		       System.out.println("2...");
+         System.out.println("2...");
                for (MinuWall w : this.stoplight) {
                     w.setColor(Color.YELLOW);
                } 
           } else if (steps == 200) {//60 orig
-		  	   System.out.println("1...GO!");
+        System.out.println("1...GO!");
                for (MinuWall w : this.stoplight) {
                     w.setColor(Color.GREEN);
                } 
@@ -417,7 +417,7 @@ public class MWWorld extends ActorWorld {
      
      // when both players are "scheduled" to die in a step
      private void bothWillDie() {
-	 	  System.out.println("Players crashed at the same time, no one wins the round.");
+     System.out.println("Players crashed at the same time, no one wins the round.");
           ArrayList<ExplosionBlock> p1List, p2List;
           Location loc1 = p1.getLocation(), loc2 = p2.getLocation();
           
@@ -457,18 +457,18 @@ public class MWWorld extends ActorWorld {
                winner = this.p2;
                loser = this.p1;
                this.score2++;
-			   if (SCORE_LIM - score2 == 0)
-			        System.out.println("p2 wins the game!");
-			   else
-			  	    System.out.println("p2 wins the round! p2 needs " + (10 - score2) + " more wins to win the game.");
+      if (SCORE_LIM - score2 == 0)
+           System.out.println("p2 wins the game!");
+      else
+          System.out.println("p2 wins the round! p2 needs " + (10 - score2) + " more wins to win the game.");
           } else { // if (num == 2)
                winner = this.p1;
                loser = this.p2;
                this.score1++;
-			   if (SCORE_LIM - score1 == 0)
-			        System.out.println("p1 wins the game!");
-			   else
-			        System.out.println("p1 wins the round! p1 needs " + (10 - score1) + " more wins to win the game.");
+      if (SCORE_LIM - score1 == 0)
+           System.out.println("p1 wins the game!");
+      else
+           System.out.println("p1 wins the round! p1 needs " + (10 - score1) + " more wins to win the game.");
           } 
           
           loser.setIsAlive(false);
@@ -487,15 +487,15 @@ public class MWWorld extends ActorWorld {
                           );
           if (score1 == SCORE_LIM)
           {
-		  	System.out.println("CHECK");
+     System.out.println("CHECK");
                this.gameOver = true;
                if (steps < 300)
                {
                     this.mwsh.stopBG();
                     this.mwsh.startBG();
                }  else {
-			       
-				}
+          
+    }
                super.setMessage(
                                 "Score: red " + score2 + ", blue " + score1 + " PLAYER 1 WINS!" +
                                 "\nPress N or Y for a new game."
