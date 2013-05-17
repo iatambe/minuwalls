@@ -8,6 +8,8 @@ public class MinuWalls {
   MWWorld game = new MWWorld();
   game.startNew();
   game.show();
+     
+     //A rather short driver...
  }
      
 }
