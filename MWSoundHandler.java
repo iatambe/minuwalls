@@ -8,28 +8,28 @@ public class MWSoundHandler {
 	 private AudioClip bgClip;
      
      public MWSoundHandler() {
-          File file = new File("explosion.wav");
-          File introFile = new File("StartSong.wav");
-		  File bgFile = new File("marioSong.wav");
+          File file = new File("explosion.wav"); //For when we hit 
+          File introFile = new File("StartSong.wav"); //The Star
+		  File bgFile = new File("marioSong.wav"); //Mid Way Gameplay music
           try {
-               this.expClip = JApplet.newAudioClip(file.toURI().toURL());
+               this.expClip = JApplet.newAudioClip(file.toURI().toURL()); //We extract the music by passing in the file URL
           } catch (Exception e) {
-               e.printStackTrace();
+               e.printStackTrace(); //The class requires us to use a try catch if we were to run into an exception. 
           } 
           try {
                this.introClip = JApplet.newAudioClip(introFile.toURI().toURL());
           } catch (Exception e) {
-               e.printStackTrace();
+               e.printStackTrace(); //Same concept used here...
           }
 		  try {
                this.bgClip = JApplet.newAudioClip(bgFile.toURI().toURL());
           } catch (Exception e) {
-               e.printStackTrace();
+               e.printStackTrace(); //and here...
           }
      } 
      
      public void playExp() {
-          this.expClip.stop();
+          this.expClip.stop(); //We can stop the music by using this method
           
           try {
                Thread.sleep(1);
@@ -37,7 +37,7 @@ public class MWSoundHandler {
                e.printStackTrace();
           } 
           
-          this.expClip.play();
+          this.expClip.play(); //or it'll continue to play
      } 
      
      public void playIntro() {

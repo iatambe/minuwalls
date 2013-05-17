@@ -7,20 +7,22 @@ import java.util.*;
 public class ExplosionBlock extends Actor {
 
 	private boolean willExplode;
-	
+	//Same as willDie, we're using a boolen to determine whether or not to blow the screen
 	public void setWillExplode(boolean val) { this.willExplode = val; }
+    //The getter of the previous method
 	public boolean getWillExplode() { return this.willExplode; }
-     
+    
+    //Our contructor will take a direction and it defaults to willExplode as false
      public ExplosionBlock(int dir) {
           super();
           this.setDirection(dir);
 		  this.willExplode = false;
      } 
-     
+     //We are creating the explosion that spreads throughout the grid
      private ExplosionBlock makeExpBlockAt(int direction, Location next) {
           ExplosionBlock block = new ExplosionBlock(direction);
-          block.setColor(this.getColor());
-          block.putSelfInGrid(this.getGrid(), next);
+          block.setColor(this.getColor()); //Its the same color as the player :) 
+          block.putSelfInGrid(this.getGrid(), next); //it'll take the NEXT locatioj
           return block;
      } 
      
@@ -30,11 +32,11 @@ public class ExplosionBlock extends Actor {
 
 /* propagate() causes the ExplosionBlocks to propagate outwards */
 public ArrayList<ExplosionBlock> propagate() { 
-     if (this.getGrid() == null || this.willExplode == true)
+     if (this.getGrid() == null || this.willExplode == true) //We're using a boolean statemment to contain the explosion and make sure it doesnt surpass the grid
           return new ArrayList<ExplosionBlock>(); 
-     int dir = this.getDirection();
-     Location loc = this.getLocation();
-     Grid<Actor> gr = this.getGrid();
+     int dir = this.getDirection();  //We're getting the data and storing it in an array list. <---
+     Location loc = this.getLocation(); //<-----
+     Grid<Actor> gr = this.getGrid(); //<=---- ARRAY_LIST ITEMS
      ArrayList<ExplosionBlock> list = new ArrayList<ExplosionBlock>();
      ExplosionBlock eb;
      
@@ -68,7 +70,7 @@ public ArrayList<ExplosionBlock> propagate() {
                eb = this.makeExpBlockAt(dir, next);
                list.add(eb);
           } else if (a != null && a instanceof ExplosionBlock) {
-			   	((ExplosionBlock)a).setWillExplode(true);
+			   	((ExplosionBlock)a).setWillExplode(true); //We don't want a cluttered area with blocks landing on other blocks so we check a condition.
 			}
      } 
      

@@ -6,7 +6,7 @@ public class MinuWall extends Actor
 	private static final Color DEFAULT_COLOR = Color.RED;
 	private int counter = 0;
 	
-	public static int LIFETIME = 100;
+	public static int LIFETIME = 100; //We want to give the life a value so we can maniulate players later. 
 	private int life;
 
 	public void setLifetime(int val) { this.life = val; }
@@ -20,11 +20,11 @@ public class MinuWall extends Actor
 	
 	public MinuWall(Color initialColor)
 	{
-		setColor(initialColor);
+		setColor(initialColor); //we have the ability to customize players in our driver. 
 	} 
 	
 	public void setCounter(int val) {
-		this.counter = val;
+		this.counter = val; 
 	} 
 	
 	public void act()

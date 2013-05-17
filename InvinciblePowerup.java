@@ -4,7 +4,8 @@ public class InvinciblePowerup extends MinuPowerup {
 
      public InvinciblePowerup()
      {
-        this.setColor(Color.yellow);    
+        this.setColor(Color.yellow);
+        //Set color to Yellow for the player when he becomes invinceable 
      }
      
  public void act() {}
