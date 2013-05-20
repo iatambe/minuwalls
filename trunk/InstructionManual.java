@@ -6,7 +6,7 @@ public class InstructionManual {
   private JOptionPane dialogBox; 
   private static int colorOfPlayers1; 
   private static int colorOfPlayers2;
-   
+  private String [] optionsYesNo;  
   
   public InstructionManual (JOptionPane s) {
     
@@ -15,25 +15,35 @@ public class InstructionManual {
   }
   
   public void instructions (){
-    String s = dialogBox.showInputDialog (null, "Would you like instructions?", "GridWorld", JOptionPane.INFORMATION_MESSAGE );
-    String yes = "Yes"; 
-    String no = "No";
-    if(s.equals(yes)){
-    dialogBox.showMessageDialog(null, "Welcome to MinuWalls, the best GridWorld game on Earth"); 
-    dialogBox.showMessageDialog(null, "Let's start with Game Instructions"); 
-        dialogBox.showMessageDialog(null, "Avoid the other players trailing wall. If you've ever played tron or light bike, you'll pick this game up fast."); 
-        dialogBox.showMessageDialog(null, "For Player 1, your controls are the Arrow Keys." + '\n' + "To move up, press the up arrow key." + '\n' + "To move down, press the down arrow key" + '\n' + "Do the same for left and right keys as they correspond to the direction."); 
+    
+    optionsYesNo = new String[2];
+    optionsYesNo[0] = new String ("Yes"); 
+    optionsYesNo[1] = new String ("No"); 
+    
+    
+    dialogBox.showOptionDialog(null, "Would you like instructions?", "GridWorld", 
+        JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE,
+        null, optionsYesNo, optionsYesNo[0]);
+    
+    if(dialogBox.getValue().equals("Yes")); {
+        System.out.print("YES");
+        
+        dialogBox.showMessageDialog(null, "Welcome to MinuWalls, the best GridWorld game on Earth"); 
+        dialogBox.showMessageDialog(null, "Let's start with Game Instructions"); 
+        dialogBox.showMessageDialog(null, "Avoid the walls that trail your opponent's bike. It's similar to tron or light bike"); 
+        dialogBox.showMessageDialog(null, "For Player 1, the controls are the Arrow Keys." + '\n' + "To move up, press the up arrow key." + '\n' + "To move down, press the down arrow key" + '\n' + "Do the same for left and right keys as they correspond to the direction."); 
         dialogBox.showMessageDialog(null, "For Player 2, use WASD key formation" + '\n' + "W moves UP, A moves left, S moves down, D moves right"); 
-        dialogBox.showMessageDialog(null, "There are powerups in the game too. Collect them and you be able to get an advantage of disadvantage in the game"); 
+        dialogBox.showMessageDialog(null, "There are powerups in the game too. Collect them and you will be able to gain an advantage or disadvantage in the game"); 
         dialogBox.showMessageDialog(null, "Wait for the stoplight to turn green and go!"); 
     }
-    
-       
-       if(s.equals(no)){
-         dialogBox.showMessageDialog(null, ":("); 
-       }
+    if(dialogBox.getValue().equals("No"));{
+             System.out.print("NO");
+             dialogBox.showMessageDialog(null, "Okay!"); 
+    }
+    }
+   
   
-  }
+  
 
   public void NCSettings () {
     String [] colorNames = {"Red", "Orange", "Blue", "Green", "Yellow"};
@@ -220,6 +230,12 @@ public class InstructionManual {
   
   public void showInstruction () {
     this.instructions();    
+    
+  }
+  
+  public static void main (String [] args) {
+    InstructionManual s = new InstructionManual(new JOptionPane()); 
+    s.instructions(); 
     
   }
   
