@@ -417,7 +417,7 @@ public class MWWorld extends ActorWorld {
      
      // when both players are "scheduled" to die in a step
      private void bothWillDie() {
-     System.out.println("Players crashed at the same time, no one wins the round.");
+     System.out.println("Players crashed at the same time, so no one wins the round.");
           ArrayList<ExplosionBlock> p1List, p2List;
           Location loc1 = p1.getLocation(), loc2 = p2.getLocation();
           
@@ -487,7 +487,6 @@ public class MWWorld extends ActorWorld {
                           );
           if (score1 == SCORE_LIM)
           {
-     System.out.println("CHECK");
                this.gameOver = true;
                if (steps < 300)
                {
