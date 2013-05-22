@@ -1,46 +1,46 @@
-import java.io.*;
+import java.io.*;//the required files to make the program run
 import java.applet.AudioClip;
 import javax.swing.JApplet;
 
 public class MWSoundHandler {
      
-     private AudioClip expClip, introClip;
-	 private AudioClip bgClip;
+     private AudioClip expClip, introClip;//expClip is explosion sound, introClip is intro music before each round.
+	 private AudioClip bgClip;//background music, mario music.
      
      public MWSoundHandler() {
-          File file = new File("explosion.wav"); //For when we hit 
-          File introFile = new File("StartSong.wav"); //The Star
-		  File bgFile = new File("marioSong.wav"); //Mid Way Gameplay music
-          try {
-               this.expClip = JApplet.newAudioClip(file.toURI().toURL()); //We extract the music by passing in the file URL
+          File file = new File("explosion.wav"); //file is the explosion sound
+          File introFile = new File("StartSong.wav"); //introFile is StartSong
+		  File bgFile = new File("marioSong.wav"); //bgFile is marioSong
+          try {//when instantiating the clips, a try catch must be used.
+               this.expClip = JApplet.newAudioClip(file.toURI().toURL()); //sets the expClip to the explosion sound file
           } catch (Exception e) {
-               e.printStackTrace(); //The class requires us to use a try catch if we were to run into an exception. 
+               e.printStackTrace();
           } 
           try {
-               this.introClip = JApplet.newAudioClip(introFile.toURI().toURL());
+               this.introClip = JApplet.newAudioClip(introFile.toURI().toURL());//see above
           } catch (Exception e) {
-               e.printStackTrace(); //Same concept used here...
+               e.printStackTrace();
           }
 		  try {
-               this.bgClip = JApplet.newAudioClip(bgFile.toURI().toURL());
+               this.bgClip = JApplet.newAudioClip(bgFile.toURI().toURL());//see above
           } catch (Exception e) {
-               e.printStackTrace(); //and here...
+               e.printStackTrace();
           }
      } 
      
      public void playExp() {
-          this.expClip.stop(); //We can stop the music by using this method
+          this.expClip.stop(); //just in case the exp is still playing, stop the sound.
           
           try {
-               Thread.sleep(1);
+               Thread.sleep(1);//there was an error with the sound not playing if two explosions played at the same time, this causes the thread to sleep for 1 millisecond
           } catch (Exception e){
                e.printStackTrace();
           } 
           
-          this.expClip.play(); //or it'll continue to play
+          this.expClip.play(); //after stopping and pausing, play the clip.
      } 
      
-     public void playIntro() {
+     public void playIntro() {//plays intro, same concept as playExp().
           this.introClip.stop();
           
           try {
@@ -52,15 +52,15 @@ public class MWSoundHandler {
           this.introClip.play();
      }
 	 
-	 public void startBG() {
+	 public void startBG() {//bg music only plays once, so no need to stop it in the start method, we have another method for stopping it.
 	 	try {
 			Thread.sleep(1);
 		} catch(Exception e) {e.printStackTrace();}
 		
-		this.bgClip.loop();
+		this.bgClip.loop();//instead of playing the music once, we made the sound clip loop.
 	}
 	
-	public void stopBG() {
+	public void stopBG() {//stops the bg music.
 		/*
 		try {
 			Thread.sleep(1);
