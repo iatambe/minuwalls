@@ -53,7 +53,7 @@ public class InstructionManual {
 			dialogBox.showMessageDialog(null, "Okay then.", "MinuWalls", JOptionPane.PLAIN_MESSAGE);
 			return;
 		}
-		res = dialogBox.showMessageDialog(null, "Avoid the walls that trail from your opponent's bike. "
+		res = dialogBox.showConfirmDialog(null, "Avoid the walls that trail from your opponent's bike. "
 			+ "It's similar to Tron, or Light Bike.",
 			"Instructions #1", JOptionPane.OK_CANCEL_OPTION,
 			JOptionPane.INFORMATION_MESSAGE);
@@ -61,7 +61,7 @@ public class InstructionManual {
 			dialogBox.showMessageDialog(null, "Okay then.", "MinuWalls", JOptionPane.PLAIN_MESSAGE);
 			return;
 		}
-		res = dialogBox.showMessageDialog(null, "For Player 1, the controls are the Arrow Keys." + '\n' 
+		res = dialogBox.showConfirmDialog(null, "For Player 1, the controls are the Arrow Keys." + '\n' 
 			+ "The arrow keys' directions are self-explanatory.",
 			"Instructions #2", JOptionPane.OK_CANCEL_OPTION,
 			JOptionPane.INFORMATION_MESSAGE);
@@ -69,7 +69,7 @@ public class InstructionManual {
 			dialogBox.showMessageDialog(null, "Okay then.", "MinuWalls", JOptionPane.PLAIN_MESSAGE);
 			return;
 		}
-		res = dialogBox.showMessageDialog(null, "For Player 2, the controls are WASD." + '\n' 
+		res = dialogBox.showConfirmDialog(null, "For Player 2, the controls are WASD." + '\n' 
 			+ "W moves up, A moves left, S moves down, D moves right.",
 			"Instructions #3", JOptionPane.OK_CANCEL_OPTION,
 			JOptionPane.INFORMATION_MESSAGE);
@@ -77,7 +77,7 @@ public class InstructionManual {
 			dialogBox.showMessageDialog(null, "Okay then.", "MinuWalls", JOptionPane.PLAIN_MESSAGE);
 			return;
 		}
-		res = dialogBox.showMessageDialog(null, "There are powerups in the game as well. "
+		res = dialogBox.showConfirmDialog(null, "There are powerups in the game as well. "
 			+ "Collect them and you will be able to gain an advantage or disadvantage.",
 			"Instructions #4", JOptionPane.OK_CANCEL_OPTION,
 			JOptionPane.INFORMATION_MESSAGE);
@@ -85,7 +85,7 @@ public class InstructionManual {
 			dialogBox.showMessageDialog(null, "Okay then.", "MinuWalls", JOptionPane.PLAIN_MESSAGE);
 			return;
 		}
-		res = dialogBox.showMessageDialog(null, "The game begins when the stoplight turns green. " + '\n'
+		res = dialogBox.showConfirmDialog(null, "The game begins when the stoplight turns green. " + '\n'
 			+ "The first person to reach 10 points wins!",
 			"Instructions #5", JOptionPane.OK_CANCEL_OPTION,
 			JOptionPane.INFORMATION_MESSAGE);
