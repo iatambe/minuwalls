@@ -1,8 +1,8 @@
 import java.awt.Color;
 
-public class DeathPowerup extends MinuPowerup {
-//We're setting the color the red here
- public DeathPowerup()
+public class DeathPowerup extends MinuPowerup {//extends an abstract class, MinuPowerup
+
+ public DeathPowerup()//default constructor sets the color red
  {
         this.setColor(Color.red);
  }
