@@ -1,16 +1,16 @@
 import java.awt.Color;
 
-public class FasterPowerup extends MinuPowerup {
+public class FasterPowerup extends MinuPowerup {//extends abstract MinuPowerup class
 
-	public FasterPowerup() {
+	public FasterPowerup() {//sets color to green, the default color
 		this.setColor(Color.green);    
 	}
      
 	public void act() {} // it stays in place
 
 	public void editPlayer(MinuWaller player) {
-		player.setDelay(1); //We want it to go a little faster than usual so we use our very own setDelay method
-		player.setWallLife(50); //the life limit of how many blocks it will be able to speed through. 
+		player.setDelay(1); //set the delay of the player to 1/2 of the normal delay
+		player.setWallLife(50); //sets the wall life to 1/2 the original life because the delay causes the walls to extend to 2x the length of the original length.
 	}
 
 }
