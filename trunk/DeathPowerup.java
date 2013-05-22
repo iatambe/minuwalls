@@ -7,11 +7,11 @@ public class DeathPowerup extends MinuPowerup {
         this.setColor(Color.red);
  }
      
- public void act() {}
+ public void act() {}//stays in place, doesn't move
  
-    //We're using a boolean method to determine whether the player is dead
+    //override polymorphism method from the abstract MinuPowerup class.
  public void editPlayer(MinuWaller player) {
-  player.setWillDie(true);
+  player.setWillDie(true);//makes the player die
  }
 
 }
