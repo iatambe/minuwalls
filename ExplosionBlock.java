@@ -6,14 +6,11 @@ import java.util.*;
 
 public class ExplosionBlock extends Actor {
 
-	private boolean willExplode;
-	//Same as willDie, we're using a boolen to determine whether or not to blow the screen
-	public void setWillExplode(boolean val) { this.willExplode = val; }
-    //The getter of the previous method
+	private boolean willExplode; //whether will explode or not in the current step
+	public void setWillExplode(boolean val) { this.willExplode = val; }//The getter of the previous method
 	public boolean getWillExplode() { return this.willExplode; }
     
-    //Our contructor will take a direction and it defaults to willExplode as false
-     public ExplosionBlock(int dir) {
+     public ExplosionBlock(int dir) {//takes the direction that it will explode in.
           super();
           this.setDirection(dir);
 		  this.willExplode = false;
