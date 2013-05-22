@@ -9,12 +9,13 @@ public class MinuWalls {
 		System.setProperty("info.gridworld.gui.selection", "hide");
 		InstructionManual manual = new InstructionManual(optionPane);
 		manual.showInstructions();
-		
+		return;
+		/*
 		MWWorld game = new MWWorld();
 		game.startNew();
 		game.show();
      	
-     
+     */
 	}
      
 }
