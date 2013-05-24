@@ -3,9 +3,8 @@ import info.gridworld.grid.*;
 import java.awt.Color;
 import java.util.*;
 
-/* When a player "eats" the InstantWinPowerup, that player's opponent explodes instantly,
- * causing the first player to win. The InstantWinPowerup moves around randomly on the grid,
- * making it harder to get.
+/* When a player gets the InstantWinPowerup, the other player explodes instantly,
+ * The InstantWinPowerup moves around randomly on the grid, making it harder to get.
  */
 
 public class InstantWinPowerup extends MinuPowerup {//extends abstract MinuPowerup
@@ -81,8 +80,7 @@ public class InstantWinPowerup extends MinuPowerup {//extends abstract MinuPower
   super.moveTo(locs.get(index));
  }
  
- /* InstantWinPowerup's editPlayer() causes the player's opponent to be 
-  * "condemned" to death.
+ /* InstantWinPowerup's editPlayer() causes the player's opponent to be set to explode.
   */
  public void editPlayer(MinuWaller player) {
   MinuWaller winner = player, loser = player.getOpponent();
