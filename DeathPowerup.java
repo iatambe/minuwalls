@@ -1,6 +1,6 @@
 import java.awt.Color;
 
-public class DeathPowerup extends MinuPowerup {//extends an abstract class, MinuPowerup
+public class DeathPowerup extends MinuPowerup {//extends an abstract class, MinuPowerup. If a player gets this powerup, he/she explodes.
 
  public DeathPowerup()//default constructor sets the color red
  {
