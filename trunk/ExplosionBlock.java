@@ -4,7 +4,7 @@ import info.gridworld.grid.*;
 import java.awt.*;
 import java.util.*;
 
-public class ExplosionBlock extends Actor {
+public class ExplosionBlock extends Actor {//ExplosionBlocks are put into a grid when a MinuWaller crashes, resulting in a propagating square of ExplosionBlocks.
 
 	private boolean willExplode; //whether will explode or not in the current step
 	public void setWillExplode(boolean val) { this.willExplode = val; }//The getter of the previous method
