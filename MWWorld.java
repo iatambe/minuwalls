@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-public class MWWorld extends ActorWorld {
+public class MWWorld extends ActorWorld {//controls the game by overriding methods from ActorWorld. Also sets up the game.
 	
 	private static Random rand = new Random();
 	
