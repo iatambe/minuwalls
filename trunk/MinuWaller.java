@@ -8,220 +8,142 @@ import java.util.*;
 
 public class MinuWaller extends Actor {//this is what the player controls with the arrow keys. It moves around the grid and leaves behind a trail of MinuWalls.
      
-     private boolean alive;
+     private boolean alive;//private data members
      private boolean aboutToDie;
      private boolean hasTurned;
-     private int count;
+     private int count;//counter for delay, if counter is less than delay, don't do anything.
+    
+     private MinuWaller opponent;//needed if changing something in the opponent such as making them die.
      
-     //  private boolean invincible;
-     private int icount;
-     private Color prevColor;
-    // private static int ICOUNT_LIMIT = -1;//100;
-     
-     private MinuWaller opponent;
-     
-     private int delay;
-	private int wallLife; 
+     private int delay;//delay value before doing anything
+     private int wallLife; //how long the "tail"/MinuWall's last before disappearing.
      
      public MinuWaller() {
-          setColor(Color.RED);
-		delay = 2;
+          setColor(Color.RED);//defaults set
+          delay = 2;
           count = 0;
-          icount = 0;
           alive = true;
           aboutToDie = false;
           hasTurned = false;
-		wallLife = MinuWall.LIFETIME;
-          //invincible = false;
+          wallLife = MinuWall.LIFETIME;//default static lifetime in MinuWall.
      } 
      
-     public void setOpponent(MinuWaller mw) { this.opponent = mw; }
-     public MinuWaller getOpponent() { return this.opponent; }
+     public void setOpponent(MinuWaller mw) { this.opponent = mw; }//sets other player to opponent
+     public MinuWaller getOpponent() { return this.opponent; }//gets opponent
      
-     //    public void setInvincible(boolean val) { this.invincible = val; }
-     //  public boolean getInvincible() { return this.invincible; }
-     
-     public void setDelay(int val) { this.delay = val; }
-     public int getDelay() { return this.delay; }
+     public void setDelay(int val) { this.delay = val; }//for speed powerups
+     public int getDelay() { return this.delay; }//returns delay
 
-	public void setWallLife(int val) { this.wallLife = val; }
-	public int getWallFile() { return this.wallLife; }
+	public void setWallLife(int val) { this.wallLife = val; }//sets how long the wall lasts
+	public int getWallLife() { return this.wallLife; }//returns wallLife
      
-     public MinuWaller(Color theColor) {
+     public MinuWaller(Color theColor) {//color constructor, calls its own default constructor and sets a color.
           this();
           this.setColor(theColor);
      } 
      
-     public boolean isAlive() { return this.alive;}  
+     public boolean isAlive() { return this.alive;}//booleans  
      public boolean willDie() { return this.aboutToDie;}
      public void setWillDie(boolean val) { this.aboutToDie = val; }   
      
      public void setIsAlive(boolean val) { this.alive = val;}  
      
-     public MinuWall go() {
-          count++;
+     public MinuWall go() {//called in MWWorld to start making the MinuWaller move.
+          count++;//doesn't move until count is equal to the delay value.
           if (count < delay) {
                return null;
           } else {
                count = 0;
           } 
           
-          /*if (this.invincible) {
-           this.icount++;
-           if (this.icount == ICOUNT_LIMIT) {
-           this.icount = 0;
-           this.invincible = false;
-           this.setColor(prevColor);
-           }
-           }*/
-          
           if (this.canMove()) {
 
-               return ( this.move() );
-          } else {
-               //if (!this.invincible)
-               //   this.aboutToDie = true;
+               return ( this.move() );//if it can move, calls the move method, which returns the wall that was created when this MinuWaller moved. 
+          } else {                     //The MWWorld class keeps track of all actors within the grid.
                return null;
           } 
      } 
      
-     public boolean canMove()
+     public boolean canMove()//checks if this can move.
      {
           Grid<Actor> gr = getGrid();
-          if (gr == null)
+          if (gr == null)//if there is no grid, the MinuWaller can't move.
                return false;
           Location loc = getLocation();
           Location next = loc.getAdjacentLocation(getDirection());
-          if (!gr.isValid(next)) {
-               /*if (this.invincible) {
-                return true;
-                } else {*/
+          if (!gr.isValid(next)) {//if the next location is off the grid, then this is set to die, and this cannot move.
                this.setWillDie(true);
                return false;
-               // }
           }
           Actor neighbor = gr.get(next);
-          if (neighbor == null) {
+          if (neighbor == null) {//if there is nothing in front of this, then this can move.
                return true;
           } else if (neighbor instanceof MinuPowerup) {
-               ((MinuPowerup)neighbor).editPlayer(this);
-               return true;
+            ((MinuPowerup)neighbor).editPlayer(this);//if there is a Powerup in front of this, this gets "edited", which changes some private data members in this.
+               return true;// this can move if there is an instanceof a MinuPowerup in front.
           } else if (neighbor instanceof MinuWaller)
           {
-               this.setWillDie(true);
+               this.setWillDie(true);//if two MinuWallers collide, they both die.
                opponent.setWillDie(true);
                return false;
-          } else if (neighbor instanceof MinuWall)
+          } else if (neighbor instanceof MinuWall)//if next neighbor is a wall, this will die.
           {
                this.setWillDie(true);
                return false;
           }
-          
-          /*else if (this.invincible) {
-           if (neighbor instanceof MinuWaller && ((MinuWaller)neighbor).getInvincible() == false) {
-           MinuWaller mw = (MinuWaller)neighbor;
-           mw.setWillDie(true);
-           this.aboutToDie = false;
-           return false;
-           }
-           else if (neighbor instanceof MinuWaller && ((MinuWaller)neighbor).getInvincible() == true
-           && gr.isValid(neighbor.getLocation().getAdjacentLocation(neighbor.getDirection()))){
-           if (gr.get(neighbor.getLocation().getAdjacentLocation(neighbor.getDirection())) == null)
-           {
-           MinuWaller mw = (MinuWaller)neighbor;
-           mw.setWillDie(true);
-           this.aboutToDie = false;
-           }
-           
-           else{
-           MinuWaller mw = (MinuWaller)neighbor;
-           mw.setWillDie(true);
-           this.aboutToDie = true;
-           }
-           return false;
-           }
-           return true;
-           } else {
-           return false;
-           }*/
           
           return true;
      } 
      
-     public MinuWall move()
+     public MinuWall move()//this method is only called if this MinuWaller can move.
      {
-          Grid<Actor> gr = getGrid();
+          Grid<Actor> gr = getGrid();//if no grid, no move.
           if (gr == null)
                return null;
           Location loc = getLocation();
-          Location next = loc.getAdjacentLocation(getDirection());
+          Location next = loc.getAdjacentLocation(getDirection());//moves to next adjacent Location.
           if (gr.isValid(next)) {
                super.moveTo(next);
-          }/* else if (this.invincible) {
-           Location togo;
-           int row = loc.getRow(), col = loc.getCol();
-           if (next.getRow() == MWWorld.GRID_WIDTH)
-           row = 0;
-           else if (next.getRow() == -1) 
-           row = MWWorld.GRID_WIDTH-1;
-           if (next.getCol() == MWWorld.GRID_LENGTH)
-           col = 0;
-           else if (next.getCol() == -1) 
-           col = MWWorld.GRID_LENGTH-1;
-           togo = new Location(row, col);
-           super.moveTo(togo);
-           //return null;
-           }*/
+          }
           else
-               removeSelfFromGrid();
-          MinuWall wall = new MinuWall(getColor());
-		wall.setLifetime(this.wallLife);
-          wall.putSelfInGrid(gr, loc);
-          this.setHasTurned(false);
-          return wall;
+               removeSelfFromGrid();//if for some reason the next Location is not valid, this removes itself from the grid.
+          MinuWall wall = new MinuWall(getColor());//MinuWalls are left behind by the same color as the MinuWaller.
+          wall.setLifetime(this.wallLife);//sets wall lifetime, may cause some MinuWalls to be separated from the tail.
+          wall.putSelfInGrid(gr, loc);//puts the wall in grid
+          this.setHasTurned(false);//after this MinuWaller moves, it can turn.
+          return wall;//the wall is returned because MWWorld needs to keep track of all actors within the grid. MWWorld needs to keep track of all the MinuWalls to tell them to act or remove self.
      } 
      
-     public boolean hasTurned()
+     public boolean hasTurned()//checks if this has turned yet within this movement.
      {
           return hasTurned;
      } 
      
-     public void setHasTurned(boolean a)
+     public void setHasTurned(boolean a)//sets hasTurned.
      {
           hasTurned = a;
      } 
      
-     /* public void becomeInvincible() {
-      this.invincible = true;
-      this.prevColor = super.getColor();
-      this.icount = 0;
-      if (this.prevColor.equals(Color.BLUE)) {
-      super.setColor(Color.CYAN);
-      } else if (this.prevColor.equals(Color.RED)) {
-      super.setColor(Color.MAGENTA);
-      } else {
-      ;//super.setColor(Color.GREEN); // this isn't supposed to happen
-      }
-      }*/
+     
      
 // creates ExplosionBlocks (for when player dies)
 // returns ArrayList of ExplosionBlocks
-     public ArrayList<ExplosionBlock> placeExpBlocks(boolean lost) {
-          Location loc = this.getLocation();
+     public ArrayList<ExplosionBlock> placeExpBlocks(boolean lost) {//lost is whether this MinuWaller lost the round or whether the round ended in a tie.
+          Location loc = this.getLocation();                          //if lost == false, tie, if lost == true, then this MinuWaller died.
           Grid<Actor> gr = this.getGrid();
-          ArrayList<ExplosionBlock> list = new ArrayList<ExplosionBlock>();
-          ExplosionBlock block;
+          ArrayList<ExplosionBlock> list = new ArrayList<ExplosionBlock>();//keeps track of all the ExplosionBlocks created in this method.
+          ExplosionBlock block;//used to instantiate blocks all around the losing MinuWaller or tied MinuWallers.
           
-          for (int dir = 0; dir <= 315; dir += 45) {
+          for (int dir = 0; dir <= 315; dir += 45) {//puts needed ExplosionBlocks around the MinuWallers
                Location next = loc.getAdjacentLocation(dir);
-               if (gr.isValid(next)) {
+               if (gr.isValid(next)) {//only puts in the grid if the Location is valid
                     block = new ExplosionBlock(dir);
                     if (lost) {
-                         block.setColor(this.getColor());
+                         block.setColor(this.getColor());//if this MinuWaller lost, then set the ExplosionBlocks to the color of the MinuWaller
                     } else {
-                         block.setColor(Color.BLACK);
+                         block.setColor(Color.BLACK);//if the round is tied, set color of the ExplosionBlocks to black.
                     } 
-                    block.putSelfInGrid(gr, next);
+                    block.putSelfInGrid(gr, next);//puts the ExplosionBlock in the grid, and adds to the list of ExplosionBlocks, which is returned.
                     list.add(block);
                } 
           } 
