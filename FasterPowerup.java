@@ -1,6 +1,6 @@
 import java.awt.Color;
 
-public class FasterPowerup extends MinuPowerup {//extends abstract MinuPowerup class
+public class FasterPowerup extends MinuPowerup {//extends abstract MinuPowerup class, makes the MinuWaller who gets it faster by changing the delay value.
 
 	public FasterPowerup() {//sets color to green, the default color
 		this.setColor(Color.green);    
