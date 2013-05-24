@@ -1,29 +1,29 @@
 import java.awt.Color;
 import info.gridworld.actor.Actor;
 
-public class MinuWall extends Actor
+public class MinuWall extends Actor//this is what is left behind by the MinuWallers.
 {
 	private static final Color DEFAULT_COLOR = Color.RED;
 	private int counter = 0;
 	
-	public static int LIFETIME = 100; //We want to give the life a value so we can maniulate players later. 
-	private int life;
+	public static int LIFETIME = 100; //how long this lasts in the grid, default is 100. 
+	private int life;//
 
-	public void setLifetime(int val) { this.life = val; }
-	public int getLifetime() { return this.life; }
+	public void setLifetime(int val) { this.life = val; }//modify the lifetime
+	public int getLifetime() { return this.life; }//get the life time value
 	
 	public MinuWall()
 	{
-		setColor(DEFAULT_COLOR);
+		setColor(DEFAULT_COLOR);//sets the default color to red, sets the lifetime.
 		life = LIFETIME;
 	} 
 	
 	public MinuWall(Color initialColor)
 	{
-		setColor(initialColor); //we have the ability to customize players in our driver. 
+		setColor(initialColor); //color constructor 
 	} 
 	
-	public void setCounter(int val) {
+	public void setCounter(int val) {//sets the counter to a value
 		this.counter = val; 
 	} 
 	
@@ -31,10 +31,10 @@ public class MinuWall extends Actor
 	{
 		if (counter == life)
 		{
-			removeSelfFromGrid();
+			removeSelfFromGrid();//when the lifetime is up, removes itself, resulting in a tail.
 		} 
 		
-		if (counter != -1)
+		if (counter != -1)//increments life counter everytime it acts.
 		counter++;
 	} 
 } 
