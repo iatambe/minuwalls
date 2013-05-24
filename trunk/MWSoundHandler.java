@@ -2,7 +2,7 @@ import java.io.*;//the required files to make the program run
 import java.applet.AudioClip;
 import javax.swing.JApplet;
 
-public class MWSoundHandler {
+public class MWSoundHandler {//plays all the sounds needed in the program
      
      private AudioClip expClip, introClip;//expClip is explosion sound, introClip is intro music before each round.
 	 private AudioClip bgClip;//background music, mario music.
