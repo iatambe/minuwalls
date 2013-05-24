@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
-public class MinuWaller extends Actor {
+public class MinuWaller extends Actor {//this is what the player controls with the arrow keys. It moves around the grid and leaves behind a trail of MinuWalls.
      
      private boolean alive;
      private boolean aboutToDie;
