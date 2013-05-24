@@ -5,7 +5,7 @@ import info.gridworld.grid.*;
  * that can affect a MinuWaller on the grid.
  */
 
-public abstract class MinuPowerup extends Actor {
+public abstract class MinuPowerup extends Actor {//the abstract Powerup for our game. Contains the necessary methods for a Powerup.
 
 	// different MinuPowerups may behave in different ways
 	// (as in, how do they behave until someone hits them)
