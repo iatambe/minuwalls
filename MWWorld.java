@@ -6,6 +6,18 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.*;
 
+/* MWWorld extends the ActorWorld class. There is exactly one MinuWallWorld per game.
+   * Unlike a regular ActorWorld, the MWWorld has private members that reference every Actor in the world.
+ * This is done so that at any given time and in any method, the MWWorld knows exactly where all
+ * of the Actors in the game are, and so that it doesn't have to search through the entire grid for Actors
+ * every time step() is called.
+   * MWWorld coordinates and controls everything inside the game. It overrides the ActorWorld's step() method,
+ * so that it can control exactly what happens in each step. It handles the scores, the creation of the stoplight at the beginning,
+ * the movement of the MinuWallers, the creation and annihilation of the MinuWalls that trail behind the MinuWaller,
+ * the random creation of MinuPowerups in the grid, the life and death of MinuWallers, and the propagation of ExplosionBlocks
+ * that are created when a MinuWaller dies. It also handles keyboard input and playing and stopping sound files.
+ */
+
 public class MWWorld extends ActorWorld {//controls the game by overriding methods from ActorWorld. Also sets up the game.
 	
 	private static Random rand = new Random();
@@ -16,20 +28,28 @@ public class MWWorld extends ActorWorld {//controls the game by overriding metho
 	public static int SCORE_LIM = 10;
 	
 	private boolean isPaused, isFirstRound; // isFirstRound is used so that the intro music doesn't play until run his hit the first time.
-	private boolean exp; // whether there is an explosion happening right now
+  // this.exp tells whether there is an explosion going on right now in the game.
+  // if there is an explosion, at least one of the players must have died in the current round.
+	private boolean exp;
+  // this.gameOver tells whether the game is over (someone has reached the score limit).
 	private boolean gameOver;
 	
-	private MinuWaller p1, p2;
-	private int score1, score2;
+	private int score1, score2; // the scores
+   
+  /* The steps variable counts the number of steps since the start of the round. It is
+   * used to keep track of real-time events in the game. 
+   */
 	private int steps;
 	
 	private KeyboardFocusManager kfm;
 	private KeyEventDispatcher ked;
 	private MWSoundHandler mwsh;
 	
-	/* these are ArrayLists, so the MWWorld can keep track of
-	 * all of its Actors at any time.
-	 */
+  /* The following are the private members that allow the MWWorld to keep track of all of its
+   * Actors at any times. Outside of these, there should be no other Actors on the grid
+   * at any time.
+   */
+  private MinuWaller p1, p2;
 	private ArrayList<MinuWall> stoplight;
 	private ArrayList<MinuWall> stoplightBoundary;
 	private ArrayList<MinuWall> walls;
@@ -45,6 +65,9 @@ public class MWWorld extends ActorWorld {//controls the game by overriding metho
 		this.gameOver = false;
 		this.mwsh = new MWSoundHandler();
 		
+    /* set up the KeyEventDispatcher. The method that handles KeyEvents 
+     * is part of the MWWorld class (see below).
+     */
 		this.kfm = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 		this.ked = new KeyEventDispatcher() { // an anonymous class :P
 			public boolean dispatchKeyEvent(KeyEvent event) {
@@ -72,7 +95,8 @@ public class MWWorld extends ActorWorld {//controls the game by overriding metho
 		isPaused = false;
 	}
 	
-	private String prevMessage; // only to be used in togglePause()
+	private String prevMessage; // ONLY to be used in togglePause()
+  // pauses or resumes the game
 	public void togglePause() {
 		if (this.isPaused) {
 			super.setMessage(this.prevMessage);
@@ -84,6 +108,209 @@ public class MWWorld extends ActorWorld {//controls the game by overriding metho
 		}
 	}
 	
+  
+	
+  // starts a new game, sets up everything
+	public void startNew() {
+		this.mwsh.stopBG();
+		if (this.gameOver)
+		{
+			this.gameOver = false;
+			super.setMessage(
+							 "Score: red " + score2 + ", blue " + score1 +
+							 "\nPress SPACE or P to pause, Y for a new round, or N for a new game (resets the score)."
+							 );
+		}
+		ArrayList<Location> locList = grid.getOccupiedLocations();
+		//this.mwsh.stopBG(); // start mario music
+		if (! locList.isEmpty()) {
+			for (Location loc : locList) {
+				Actor a = grid.get(loc);
+				a.removeSelfFromGrid();
+			}
+		}
+		
+		this.steps = 0;
+		this.p1 = new MinuWaller(Color.BLUE);
+		this.p2 = new MinuWaller(); // Color.RED
+		
+		this.p1.setDirection(Location.WEST);
+		this.p2.setDirection(Location.EAST);
+		p1.setOpponent(p2);
+		p2.setOpponent(p1);
+		super.add(new Location(20, 87), p1);
+		super.add(new Location(20, 4), p2);
+		
+		this.expBlocks = new ArrayList<ExplosionBlock> ();
+		this.walls = new ArrayList<MinuWall>();
+		this.powers = new ArrayList<MinuPowerup>();
+		
+		if (!this.isFirstRound)
+			mwsh.playIntro();
+		this.drawStoplight();
+		
+		this.exp = false;
+	}
+	
+  // this is the method for creating the stoplight. It is made of MinuWalls.
+	public void drawStoplight() {
+		this.stoplight = new ArrayList<MinuWall>();
+		this.stoplightBoundary = new ArrayList<MinuWall>();
+		for (int i = GRID_LENGTH/2 - 3; i <= GRID_LENGTH/2 + 2; i++) {
+			MinuWall wall1 = new MinuWall(Color.BLACK), wall2 = new MinuWall(Color.BLACK);
+			wall1.setCounter(-1); wall2.setCounter(-1);
+			this.stoplightBoundary.add(wall1);
+			this.stoplightBoundary.add(wall2);
+			super.add(new Location(GRID_WIDTH/2 - 4, i), wall1);
+			super.add(new Location(GRID_WIDTH/2 + 3, i), wall2);
+		}
+		for (int i = GRID_WIDTH/2 - 3; i <= GRID_WIDTH/2 + 2; i++) {
+			MinuWall wall1 = new MinuWall(Color.BLACK), wall2 = new MinuWall(Color.BLACK);
+			wall1.setCounter(-1); wall2.setCounter(-1);
+			this.stoplightBoundary.add(wall1);
+			this.stoplightBoundary.add(wall2);
+			super.add(new Location(i, GRID_LENGTH/2 - 3), wall1);
+			super.add(new Location(i, GRID_LENGTH/2 + 2), wall2);
+		}
+		for (int i = GRID_LENGTH/2 - 2; i <= GRID_LENGTH/2 + 1; i++) {
+			for (int j = GRID_WIDTH/2 - 3; j <= GRID_WIDTH/2 + 2; j++) {
+				MinuWall wall = new MinuWall(Color.RED);
+				wall.setCounter(-1);
+				this.stoplight.add(wall);
+				super.add(new Location(j, i), wall);
+			}
+		}
+	}
+	
+  /* This is the all-important step() method. Unlike ActorWorld's step() method,
+   * which simply loops through the grid and acquires a list of Actors and calls their act() methods
+   * this step() method handles all of the real-time events in the game. It has access to all of the Actors
+   * on the grid at any time due to the MWWorld's private data members. 
+   */
+	@Override public void step() {
+		if (steps == 2147483647)//maximum int limit
+			steps = 999;
+		
+		if (this.isPaused) {
+			return;
+		}
+		
+		if (this.gameOver == true)
+		{
+			if (this.exp == false)
+			{
+				return;
+			}
+			
+		}
+		
+		if (this.isFirstRound) {
+			mwsh.playIntro();
+			this.isFirstRound = false;
+		}
+		
+    // start background music at step #305
+		if (this.steps == 305 && !this.exp) {
+			this.mwsh.startBG();
+		}
+		
+		this.steps++;
+		
+		/* for the stoplight */
+		boolean shouldContinue = ( this.handleStoplight() );
+		if (!shouldContinue) {
+			return;
+		}
+		
+		/* This point is reached IFF the stoplight has turned green. */
+		
+		boolean p1WillDie = false, p2WillDie = false;
+		
+		if (this.p1.isAlive() && this.p2.isAlive()) {
+			
+			// create a random MinuPowerup if this.steps is in the set
+         // 100 * (2n + 1), where n is a natural number
+			if (this.steps >= 200 && this.steps % 200 == 100) {
+				this.spawnRandomPowerup();
+			}
+			
+      // causes the players to act
+			this.actPlayers();
+			
+			p1WillDie = this.p1.willDie();
+			p2WillDie = this.p2.willDie();
+			
+      // if at least one player is dead, set this.exp to true,
+      // stop the background music, and play the explosion sound.
+			if (p1WillDie || p2WillDie) {
+				this.mwsh.stopBG();
+				this.mwsh.playExp();
+				this.exp = true;
+			}
+			
+			if (p1WillDie && p2WillDie) {
+				// if both players are about to die
+				this.bothWillDie();
+				
+			} else if (p1WillDie != p2WillDie) {
+				int num = (p1WillDie ? 1 : 2);
+				// if one player will die
+				this.oneWillDie(num);
+			}
+			
+		} else { // if at least one player is ALREADY dead
+			int i = 0;
+      // make the ExplosionBlocks propagate, add anything new, and delete everything
+      // that was removed from the grid.
+			ArrayList<ExplosionBlock> newList = new ArrayList<ExplosionBlock>();
+			while (i < this.expBlocks.size()) {
+				ExplosionBlock eb = this.expBlocks.get(i);
+				if (eb.getWillExplode() == true) {
+					if (eb.getGrid() == this.grid) {
+						eb.removeSelfFromGrid();
+					}
+					this.expBlocks.remove(i);
+					continue;
+				}
+				ArrayList<ExplosionBlock> tempList = eb.propagate();
+				eb.removeSelfFromGrid();
+				// by now eb is removed from the grid
+				for (ExplosionBlock temp : tempList) {
+					newList.add(temp);
+				}
+				i++;
+			}
+      
+      // IMPORTANT: when the explosion completes, a new round automatically starts
+			this.expBlocks = newList;
+			if (this.expBlocks.isEmpty() && gameOver == false) {
+				this.exp = false;
+				this.startNew();
+			}
+		}
+		
+    // make all the MinuPowerups act(), and remove anything that has been removed 
+    // from the grid
+		int i = 0;
+		while (i < this.powers.size()) {
+			MinuPowerup mp = this.powers.get(i);
+			if (mp.getGrid() == this.grid) {
+				i++;
+				if (!this.exp) {
+					mp.act();
+				}
+			} else {
+				this.powers.remove(i);
+			}
+		}
+		
+	}
+	
+	/* The following methods are used in MWWorld's step() method.
+	 * They are private, and should ONLY be called in this.step().
+	 */
+    
+  // creates MinuPowerup at a random location in the grid
 	public void spawnRandomPowerup() {
 		MinuPowerup mp;
 		int val = rand.nextInt(100) + 1;
@@ -147,214 +374,8 @@ public class MWWorld extends ActorWorld {//controls the game by overriding metho
 		return;
 	}
 	
-	public void startNew() {
-		this.mwsh.stopBG();
-		if (this.gameOver)
-		{
-			this.gameOver = false;
-			super.setMessage(
-							 "Score: red " + score2 + ", blue " + score1 +
-							 "\nPress SPACE or P to pause, Y for a new round, or N for a new game (resets the score)."
-							 );
-		}
-		ArrayList<Location> locList = grid.getOccupiedLocations();
-		//this.mwsh.stopBG(); // start mario music
-		if (! locList.isEmpty()) {
-			for (Location loc : locList) {
-				Actor a = grid.get(loc);
-				a.removeSelfFromGrid();
-			}
-		}
-		
-		this.steps = 0;
-		this.p1 = new MinuWaller(Color.BLUE);
-		this.p2 = new MinuWaller(); // Color.RED
-		
-		// for testing
-        //  p2.becomeInvincible();
-		//p1.becomeInvincible();
-		
-		this.p1.setDirection(Location.WEST);
-		this.p2.setDirection(Location.EAST);
-		p1.setOpponent(p2);
-		p2.setOpponent(p1);
-		super.add(new Location(20, 87), p1);
-		super.add(new Location(20, 4), p2);
-		
-		this.expBlocks = new ArrayList<ExplosionBlock> ();
-		this.walls = new ArrayList<MinuWall>();
-		this.powers = new ArrayList<MinuPowerup>();
-		
-		if (!this.isFirstRound)
-			mwsh.playIntro();
-		this.drawStoplight();
-		
-		this.exp = false;
-	}
-	
-	public void drawStoplight() {
-		this.stoplight = new ArrayList<MinuWall>();
-		this.stoplightBoundary = new ArrayList<MinuWall>();
-		for (int i = GRID_LENGTH/2 - 3; i <= GRID_LENGTH/2 + 2; i++) {
-			MinuWall wall1 = new MinuWall(Color.BLACK), wall2 = new MinuWall(Color.BLACK);
-			wall1.setCounter(-1); wall2.setCounter(-1);
-			this.stoplightBoundary.add(wall1);
-			this.stoplightBoundary.add(wall2);
-			super.add(new Location(GRID_WIDTH/2 - 4, i), wall1);
-			super.add(new Location(GRID_WIDTH/2 + 3, i), wall2);
-		}
-		for (int i = GRID_WIDTH/2 - 3; i <= GRID_WIDTH/2 + 2; i++) {
-			MinuWall wall1 = new MinuWall(Color.BLACK), wall2 = new MinuWall(Color.BLACK);
-			wall1.setCounter(-1); wall2.setCounter(-1);
-			this.stoplightBoundary.add(wall1);
-			this.stoplightBoundary.add(wall2);
-			super.add(new Location(i, GRID_LENGTH/2 - 3), wall1);
-			super.add(new Location(i, GRID_LENGTH/2 + 2), wall2);
-		}
-		for (int i = GRID_LENGTH/2 - 2; i <= GRID_LENGTH/2 + 1; i++) {
-			for (int j = GRID_WIDTH/2 - 3; j <= GRID_WIDTH/2 + 2; j++) {
-				MinuWall wall = new MinuWall(Color.RED);
-				wall.setCounter(-1);
-				this.stoplight.add(wall);
-				super.add(new Location(j, i), wall);
-			}
-		}
-	}
-	
-	@Override public void step() {
-		if (steps == 2147483647)//maximum int limit
-			steps = 999;
-		
-		if (this.isPaused) {
-			return;
-		}
-		
-		if (this.gameOver == true)
-		{
-			if (exp == false)
-			{
-				return;
-			}
-			/*ArrayList <Location>allActorLocs;
-			 
-			 if (p1Won)
-			 allActorLocs = p1.getGrid().getOccupiedLocations();
-			 else
-			 allActorLocs = p2.getGrid().getOccupiedLocations();
-			 for (Location a : allActorLocs)
-			 {
-			 if (p1Won)
-			 {
-			 if (p1.getGrid().get(a) instanceof ExplosionBlock)
-			 steps--;//
-			 }
-			 
-			 else
-			 {
-			 
-			 }
-			 }*/
-			
-		}
-		
-		if (this.isFirstRound){
-			mwsh.playIntro();
-			this.isFirstRound = false;
-		}
-		
-		if (this.steps == 305 && !exp) {// && score1 != SCORE_LIM && score2 != SCORE_LIM) {
-			
-			this.mwsh.startBG();
-		}
-		
-		steps++;
-		
-		/* for the stoplight */
-		boolean shouldContinue = this.handleStoplight();
-		if (!shouldContinue) {
-			return;
-		}
-		
-		/* This point is reached if the stoplight is green */
-		
-		boolean p1WillDie = false, p2WillDie = false;
-		
-		if (this.p1.isAlive() && this.p2.isAlive()) {
-			
-			// random Powerup maker
-			if (this.steps >= 200 && this.steps % 200 == 100) {//% 150 == 100
-				this.spawnRandomPowerup();
-			}
-			
-			this.actPlayers();
-			
-			p1WillDie = p1.willDie();
-			p2WillDie = p2.willDie();
-			
-			if (p1WillDie || p2WillDie) {
-				this.mwsh.stopBG();
-				this.mwsh.playExp();
-				this.exp = true;
-			}
-			
-			if (p1WillDie && p2WillDie) {
-				
-				this.bothWillDie();
-				
-			} else if (p1WillDie != p2WillDie) {
-				int num = (p1WillDie ? 1 : 2);
-				
-				this.oneWillDie(num);
-			}
-			
-		} else { // if at least one player is dead
-			int i = 0;
-			ArrayList<ExplosionBlock> newList = new ArrayList<ExplosionBlock>();
-			while (i < this.expBlocks.size()) {
-				ExplosionBlock eb = this.expBlocks.get(i);
-				if (eb.getWillExplode() == true) {
-					if (eb.getGrid() == this.grid) {
-						eb.removeSelfFromGrid();
-					}
-					this.expBlocks.remove(i);
-					continue;
-				}
-				ArrayList<ExplosionBlock> tempList = eb.propagate();
-				eb.removeSelfFromGrid();
-				// by now eb is removed from the grid
-				for (ExplosionBlock temp : tempList) {
-					newList.add(temp);
-				}
-				i++;
-			}
-			this.expBlocks = newList;
-			if (this.expBlocks.isEmpty() && gameOver == false) {
-				this.exp = false;
-				this.startNew();
-			}
-		}
-		
-		int i = 0;
-		while (i < this.powers.size()) {
-			MinuPowerup mp = this.powers.get(i);
-			if (mp.getGrid() == this.grid) {
-				i++;
-				if (!this.exp) {
-					mp.act();
-				}
-			} else {
-				this.powers.remove(i);
-			}
-		}
-		
-	} // end step()
-	
-	/* The following methods are used in the world's step().
-	 * They are private, and should only be called in this.step().
-	 */
-	
 	// Controls the stoplight based on the value of this.steps.
-	// return value: whether the other Actors may act() yet
+	// return value: whether the other Actors should act() yet
 	private boolean handleStoplight() {
 		if (steps == 1) {
 			System.out.println("3...");
